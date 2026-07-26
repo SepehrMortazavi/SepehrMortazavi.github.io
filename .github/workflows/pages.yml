@@ -24,12 +24,15 @@ jobs:
       - name: Validate site files and references
         run: python3 scripts/validate_site.py
 
+      - name: Validate JavaScript syntax
+        run: node --check script.js
+
       - name: Build complete static artifact
         run: |
           mkdir -p _site/assets
-          cp index.html style.css .nojekyll _site/
+          cp index.html style.css script.js .nojekyll _site/
           cp assets/* _site/assets/
-          test "$(find _site -type f | wc -l)" -ge 7
+          test "$(find _site -type f | wc -l)" -ge 8
           find _site -type f -print
 
       - name: Configure GitHub Pages
