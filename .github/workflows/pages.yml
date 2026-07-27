@@ -3,60 +3,51 @@ name: Portfolio CI/CD
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  validate-and-package:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout complete repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate site files and references
-        run: python3 scripts/validate_site.py
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
 
-      - name: Validate JavaScript syntax
-        run: node --check script.js
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Build complete static artifact
-        run: |
-          mkdir -p _site/assets
-          cp index.html style.css script.js .nojekyll _site/
-          cp assets/* _site/assets/
-          test "$(find _site -type f | wc -l)" -ge 8
-          find _site -type f -print
+      - name: Build static portfolio
+        run: npm run build
 
       - name: Configure GitHub Pages
-        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
 
-      - name: Upload complete Pages artifact
-        if: github.event_name != 'pull_request'
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: _site
-          include-hidden-files: true
+          path: out
 
   deploy:
-    if: github.event_name != 'pull_request'
-    needs: validate-and-package
+    needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy verified artifact to GitHub Pages
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
