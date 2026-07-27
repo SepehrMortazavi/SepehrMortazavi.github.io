@@ -2274,7 +2274,8 @@ button:focus-visible {
 }
 
 .hero-theatre .character-figure {
-  bottom: 9rem;
+  bottom: 8.6rem;
+  transform-origin: bottom center;
   animation: character-arrive 1.1s cubic-bezier(0.16, 0.84, 0.28, 1) both;
 }
 
@@ -2399,15 +2400,15 @@ button:focus-visible {
 @keyframes character-arrive {
   0% {
     opacity: 0;
-    transform: translateX(-16%) translateY(72px) scale(0.9);
+    transform: translateX(-16%) translateY(72px) scale(0.76);
   }
   62% {
     opacity: 1;
-    transform: translateX(-53%) translateY(-4px) scale(1.015);
+    transform: translateX(-53%) translateY(-4px) scale(0.835);
   }
   100% {
     opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
+    transform: translateX(-50%) translateY(0) scale(0.82);
   }
 }
 
