@@ -229,6 +229,46 @@ function CharacterTheatre({
   );
 }
 
+function EngineeringDossier({
+  active,
+  hero = false,
+}: {
+  active: number;
+  hero?: boolean;
+}) {
+  const scene = characterScenes[active];
+
+  return (
+    <div className={`engineering-dossier ${hero ? "dossier-hero" : ""}`}>
+      <div className="dossier-header">
+        <span>PROFESSIONAL RECORD</span>
+        <span>0{active + 1} / 05</span>
+      </div>
+      <div className="dossier-index" aria-hidden="true">
+        0{active + 1}
+      </div>
+      <div className="dossier-content" key={scene.role}>
+        <p>{scene.years}</p>
+        <h2>{scene.role}</h2>
+        <span>{scene.place}</span>
+        <div className="dossier-rule" />
+        <p className="dossier-summary">{scene.speech}</p>
+      </div>
+      <div className="dossier-capabilities" aria-label="Core engineering capabilities">
+        <span>AI SYSTEMS</span>
+        <span>MLOPS</span>
+        <span>COMPUTER VISION</span>
+        <span>ROBOTICS</span>
+      </div>
+      <div className="dossier-progress" aria-label={`Record ${active + 1} of 5`}>
+        {characterScenes.map((item, index) => (
+          <i className={index === active ? "active" : ""} key={item.role} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [activeChapter, setActiveChapter] = useState(0);
 
@@ -314,13 +354,12 @@ export default function Home() {
             AI &amp; MLOps Engineer · Germany
           </div>
           <h1 id="hero-title" className="reveal-now reveal-delay-1">
-            Current AI systems work
-            <span>and prior engineering experience.</span>
+            AI &amp; MLOps engineer
+            <span>building dependable systems.</span>
           </h1>
           <p className="hero-lede reveal-now reveal-delay-2">
-            This portfolio presents current university research responsibilities
-            first, followed by the academic and industrial experience that
-            preceded them.
+            Computer vision, robotics and production infrastructure — supported
+            by practical research, deployment and manufacturing experience.
           </p>
           <div className="hero-actions reveal-now reveal-delay-3">
             <a className="button button-primary" href="#story">
@@ -338,7 +377,7 @@ export default function Home() {
         </div>
 
         <div className="hero-character-wrap reveal-now reveal-delay-2">
-          <CharacterTheatre active={0} hero />
+          <EngineeringDossier active={0} hero />
         </div>
 
         <div className="hero-foot reveal-now reveal-delay-3">
@@ -521,8 +560,8 @@ export default function Home() {
             </p>
           </article>
         </div>
-        <aside className="character-stage-wrap" aria-label="Stage-specific character illustration and factual summary">
-          <CharacterTheatre active={activeChapter} />
+        <aside className="character-stage-wrap" aria-label="Stage-specific professional record">
+          <EngineeringDossier active={activeChapter} />
         </aside>
       </section>
 
