@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
+const isSitesBuild = process.env.SITES_BUILD === "1";
+
 const nextConfig: NextConfig = {
-  output: "export",
+  ...(isSitesBuild ? {} : { output: "export" as const }),
   images: {
     unoptimized: true,
   },

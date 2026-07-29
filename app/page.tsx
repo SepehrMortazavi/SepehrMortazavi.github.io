@@ -1,684 +1,631 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import Image from "next/image";
+import { Fragment, useEffect, useState, type CSSProperties } from "react";
+import {
+  siteContent,
+  type Language,
+  type Project,
+  type SiteContent,
+} from "./content";
 
-const characterScenes = [
-  {
-    role: "UNIVERSITY RESEARCH WORK",
-    years: "2025 — NOW",
-    place: "OSTFALIA UNIVERSITY",
-    speech:
-      "At Ostfalia, my responsibilities include AI component development, deployment, Linux infrastructure, technical documentation and supervision of student project groups.",
-    visualScene: 3,
-  },
-  {
-    role: "CELLCORE PROJECT",
-    years: "2025",
-    place: "TUNICORN · 1ST PLACE",
-    speech:
-      "CellCore received first place at TUniCorn 2025. The project combined cell segmentation, backend services, on-premise GPU inference and Kubernetes deployment.",
-    visualScene: 4,
-  },
-  {
-    role: "M.SC. DIGITAL TECHNOLOGIES",
-    years: "2023 — 2026",
-    place: "TU CLAUSTHAL",
-    speech:
-      "The M.Sc. Digital Technologies programme extended my mechanical background into software engineering, computer vision, robotics, backend systems and MLOps.",
-    visualScene: 2,
-  },
-  {
-    role: "ACADEMIC PREPARATION",
-    years: "2021 — 2023",
-    place: "IRAN → GERMANY",
-    speech:
-      "I completed language and academic preparation in Germany while working in hotel operations. This period developed German C1, English B2 and service coordination experience.",
-    visualScene: 1,
-  },
-  {
-    role: "MECHANICAL MANUFACTURING",
-    years: "2018 — 2021",
-    place: "ISFAHAN, IRAN",
-    speech:
-      "I worked in CNC manufacturing, injection-mould tooling, assembly-line coordination and quality assurance. These roles established my process and tolerance awareness.",
-    visualScene: 0,
-  },
-];
-
-const projects = [
-  {
-    number: "01",
-    title: "CellCore",
-    eyebrow: "Master thesis · TUniCorn 1st place",
-    description:
-      "GDPR-compliant microscopy analysis using Cellpose, FastAPI, on-premise GPU inference, Kubernetes and Helm.",
-    image: "/projects/cell-segmentation.png",
-    imageAlt:
-      "CellCore interface showing microscopy cell segmentation and analysis",
-    outcome: "On-premise GPU inference deployed with Kubernetes and Helm",
-    tags: ["Cellpose", "FastAPI", "Kubernetes", "Helm"],
-    href: "https://github.com/SepehrMortazavi/cell_segmentation_platfoarm",
-    linkLabel: "View repository",
-  },
-  {
-    number: "02",
-    title: "Robot-Arm Reinforcement Learning",
-    eyebrow: "Reinforcement learning · Ostfalia",
-    description:
-      "Simulation-based robot-arm training and control using ROS2, Gazebo, MuJoCo and reinforcement learning.",
-    image: "/projects/robotics-dashboard.png",
-    imageAlt: "Robotics control interface for connecting and operating a robot arm",
-    outcome: "≈85% target-approach success across >1,000 training episodes",
-    tags: ["ROS2", "Gazebo", "MuJoCo", "RL"],
-    href: "https://github.com/SepehrMortazavi/robotics_app",
-    linkLabel: "View repository",
-  },
-  {
-    number: "03",
-    title: "Church OS",
-    eyebrow: "Full-stack · Live in production",
-    description:
-      "Event, registration and administration platform using Next.js, PostgreSQL, Docker and Nginx.",
-    image: "/projects/church-os.png",
-    imageAlt: "FeG Kreuzheber website showing the illustrated church at night",
-    outcome: "Production deployment at feg-kreuzheber.de",
-    tags: ["Next.js", "PostgreSQL", "Docker", "Nginx"],
-    href: "https://feg-kreuzheber.de",
-    linkLabel: "Open deployment",
-  },
-  {
-    number: "04",
-    title: "Satellite Change Detection",
-    eyebrow: "Remote sensing · Computer vision",
-    description:
-      "Multi-source satellite change analysis using NDVI, SAR log-ratio methods, OpenCV and GDAL.",
-    image: "/projects/change-detection.png",
-    imageAlt: "Satellite change detection map and result visualization",
-    outcome: "NDVI and SAR log-ratio analysis in an interactive interface",
-    tags: ["OpenCV", "GDAL", "React", "Docker"],
-    href: "https://github.com/SepehrMortazavi/iran-damage-assessment",
-    linkLabel: "View repository",
-  },
-];
-
-function Arrow() {
-  return <span aria-hidden="true">↗</span>;
+function Arrow({ direction = "diagonal" }: { direction?: "diagonal" | "down" | "right" }) {
+  const glyph = direction === "down" ? "↓" : direction === "right" ? "→" : "↗";
+  return (
+    <span className="arrow" aria-hidden="true">
+      {glyph}
+    </span>
+  );
 }
 
-function CharacterFigure({ scene }: { scene: number }) {
+function OrbitStamp({ text }: { text: string }) {
   return (
-    <div className={`character-figure character-${scene}`} aria-hidden="true">
-      <div className="character-shadow" />
-      <div className="character-head">
-        <span className="character-hair" />
-        <span className="character-brow brow-left" />
-        <span className="character-brow brow-right" />
-        <span className="character-eye eye-left" />
-        <span className="character-eye eye-right" />
-        <span className="character-nose" />
-        <span className="character-smile" />
-        <span className="character-ear ear-left" />
-        <span className="character-ear ear-right" />
-      </div>
-      <div className="character-neck" />
-      <div className="character-body">
-        <span className="character-collar collar-left" />
-        <span className="character-collar collar-right" />
-        <span className="character-badge">SM</span>
-        <span className="character-seam" />
-      </div>
-      <div className="character-arm arm-left">
-        <span className="character-hand" />
-      </div>
-      <div className="character-arm arm-right">
-        <span className="character-hand" />
-      </div>
-      <div className="character-leg leg-left">
-        <span className="character-shoe" />
-      </div>
-      <div className="character-leg leg-right">
-        <span className="character-shoe" />
-      </div>
+    <div className="orbit-stamp" aria-hidden="true">
+      <svg viewBox="0 0 200 200">
+        <defs>
+          <path
+            id="orbit-path"
+            d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0"
+          />
+        </defs>
+        <text>
+          <textPath href="#orbit-path">{text}</textPath>
+        </text>
+      </svg>
+      <strong>SM</strong>
     </div>
   );
 }
 
-function SceneProps({ scene }: { scene: number }) {
-  return (
-    <div className={`scene-props props-${scene}`} aria-hidden="true">
-      <div className="factory-gear gear-a" />
-      <div className="factory-gear gear-b" />
-      <div className="factory-gauge">± 0.01</div>
-
-      <div className="travel-route">
-        <span />
-        <i />
-      </div>
-      <div className="travel-sign">IRAN&nbsp;&nbsp;→&nbsp;&nbsp;GERMANY</div>
-      <div className="travel-case">
-        <span />
-      </div>
-
-      <div className="learning-orbit orbit-python">PY</div>
-      <div className="learning-orbit orbit-vision">CV</div>
-      <div className="learning-orbit orbit-api">API</div>
-      <div className="learning-orbit orbit-ops">OPS</div>
-
-      <div className="robot-arm">
-        <span className="robot-base" />
-        <span className="robot-joint joint-a" />
-        <span className="robot-bone bone-a" />
-        <span className="robot-joint joint-b" />
-        <span className="robot-bone bone-b" />
-        <span className="robot-claw" />
-      </div>
-      <div className="server-stack">
-        <span />
-        <span />
-        <span />
-      </div>
-
-      <div className="character-trophy">
-        <strong>1</strong>
-        <span>ST</span>
-      </div>
-      <div className="celebration-ray ray-a" />
-      <div className="celebration-ray ray-b" />
-      <div className="celebration-ray ray-c" />
-    </div>
-  );
-}
-
-function CharacterTheatre({
-  active,
-  hero = false,
+function ProjectScene({
+  project,
+  index,
+  total,
+  generic,
 }: {
-  active: number;
-  hero?: boolean;
+  project: Project;
+  index: number;
+  total: number;
+  generic: SiteContent["generic"];
 }) {
-  const scene = characterScenes[active];
-  const visualScene = scene.visualScene;
+  const mediaContents = (
+    <>
+      <div className="browser-bar">
+        <span />
+        <span />
+        <span />
+        <small>
+          {generic.case}_{project.number}
+        </small>
+      </div>
+      <div className="project-image-wrap">
+        {project.gallery ? (
+          <div
+            className={`project-gallery gallery-${project.gallery.length}`}
+            aria-label={project.imageAlt}
+          >
+            {project.gallery.map((item) => (
+              <figure key={item.src}>
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  width={1280}
+                  height={1600}
+                  sizes="(max-width: 800px) 88vw, 28vw"
+                />
+                <figcaption>{item.label}</figcaption>
+              </figure>
+            ))}
+          </div>
+        ) : project.image ? (
+          <Image
+            src={project.image}
+            alt={project.imageAlt}
+            width={1600}
+            height={1100}
+            sizes="(max-width: 800px) 100vw, 55vw"
+          />
+        ) : null}
+      </div>
+      <div className="image-corner">
+        {project.mediaLabel ?? generic.open}
+        {project.mediaHref ? <Arrow /> : null}
+      </div>
+    </>
+  );
 
   return (
-    <div
-      className={`character-theatre theatre-${visualScene} ${hero ? "hero-theatre" : ""}`}
-      style={{ "--scene": active } as CSSProperties}
+    <article
+      className={`project-scene tone-${project.tone}`}
+      data-motion
+      style={{ "--stack-index": index } as CSSProperties}
     >
-      <div className="theatre-grid" aria-hidden="true" />
-      <div className="theatre-number" aria-hidden="true">
-        0{active + 1}
+      <div className="project-ghost" aria-hidden="true">
+        {project.number}
       </div>
-      <div className="theatre-role">
-        <span>{scene.years}</span>
-        <strong>{scene.role}</strong>
-      </div>
-      <SceneProps scene={visualScene} />
-      <CharacterFigure scene={visualScene} />
-      <div className="character-voice" key={active}>
-        <span>SEPEHR MORTAZAVI · {scene.place}</span>
-        <p>{scene.speech}</p>
-      </div>
-      {!hero && (
-        <div className="theatre-progress" aria-label={`Stage ${active + 1} of 5`}>
-          {characterScenes.map((item, index) => (
-            <span className={index === active ? "active" : ""} key={item.role} />
+
+      <div className="project-copy">
+        <div className="project-meta">
+          <span>
+            {project.number} / {String(total).padStart(2, "0")}
+          </span>
+          <span>{project.label}</span>
+        </div>
+        <h3>{project.title}</h3>
+        <p>{project.description}</p>
+        <div className="project-result">
+          <span>{generic.provenResult}</span>
+          <strong>{project.result}</strong>
+        </div>
+        {project.disclosure ? (
+          <p className="project-disclosure">{project.disclosure}</p>
+        ) : null}
+        <ul aria-label={`${project.title}: ${generic.technologies}`}>
+          {project.tags.map((tag) => (
+            <li key={tag}>{tag}</li>
+          ))}
+        </ul>
+        <div className="project-links">
+          {project.actions.map((action) => (
+            <a
+              className={`project-link link-${action.emphasis ?? "primary"}`}
+              href={action.href}
+              key={action.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {action.label} <Arrow />
+            </a>
           ))}
         </div>
+      </div>
+
+      {project.mediaHref ? (
+        <a
+          className="project-media"
+          href={project.mediaHref}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`${project.mediaLabel ?? generic.open}: ${project.title}`}
+        >
+          {mediaContents}
+        </a>
+      ) : (
+        <div className="project-media">{mediaContents}</div>
       )}
-    </div>
+    </article>
   );
 }
 
 export default function Home() {
-  const [activeChapter, setActiveChapter] = useState(0);
+  const [motionEnabled, setMotionEnabled] = useState(true);
+  const [language, setLanguage] = useState<Language>("en");
+  const content = siteContent[language];
 
   useEffect(() => {
-    const setProgress = () => {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = max > 0 ? window.scrollY / max : 0;
-      document.documentElement.style.setProperty("--scroll-progress", `${progress}`);
+    document.documentElement.lang = language;
+    document.title =
+      language === "de"
+        ? "Seyed Sepehr Mortazavi — KI- & MLOps-Engineer"
+        : "Seyed Sepehr Mortazavi — AI & MLOps Engineer";
+  }, [language]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("motion-full", motionEnabled);
+    return () => document.documentElement.classList.remove("motion-full");
+  }, [motionEnabled]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const motionElements = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-motion]"),
+    );
+    const revealElements = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-reveal]"),
+    );
+
+    root.classList.add("js");
+
+    let frame = 0;
+    let pointerFrame = 0;
+    let previousY = window.scrollY;
+    let motionMetrics: Array<{
+      element: HTMLElement;
+      height: number;
+      top: number;
+    }> = [];
+
+    const measureMotion = () => {
+      motionMetrics = motionElements.map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          element,
+          height: Math.max(1, rect.height),
+          top: rect.top + window.scrollY,
+        };
+      });
+    };
+
+    const updateMotion = () => {
+      frame = 0;
+      const viewport = window.innerHeight;
+      const pageMax = root.scrollHeight - viewport;
+      const pageProgress = pageMax > 0 ? window.scrollY / pageMax : 0;
+
+      root.style.setProperty("--page-progress", pageProgress.toFixed(4));
+      root.classList.toggle("is-scrolled", window.scrollY > 24);
+      root.dataset.direction = window.scrollY >= previousY ? "down" : "up";
+      previousY = window.scrollY;
+
+      motionMetrics.forEach(({ element, height, top }) => {
+        const raw = element.classList.contains("hero")
+          ? (window.scrollY - top) / height
+          : (window.scrollY + viewport - top) / (viewport + height);
+        const progress = Math.min(1, Math.max(0, raw));
+        element.style.setProperty("--p", progress.toFixed(4));
+      });
+    };
+
+    const requestMotionUpdate = () => {
+      if (!frame) frame = requestAnimationFrame(updateMotion);
+    };
+
+    const handleResize = () => {
+      measureMotion();
+      requestMotionUpdate();
+    };
+
+    const updatePointer = (event: PointerEvent) => {
+      cancelAnimationFrame(pointerFrame);
+      pointerFrame = requestAnimationFrame(() => {
+        root.style.setProperty("--pointer-x", `${event.clientX}px`);
+        root.style.setProperty("--pointer-y", `${event.clientY}px`);
+      });
     };
 
     const revealObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("is-visible");
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            revealObserver.unobserve(entry.target);
+          }
         });
       },
-      { threshold: 0.14 },
+      { threshold: 0.1, rootMargin: "0px 0px -7% 0px" },
     );
 
-    const chapterObserver = new IntersectionObserver(
+    const navigationObserver = new IntersectionObserver(
       (entries) => {
-        const visible = entries
+        const current = entries
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) {
-          const index = Number((visible.target as HTMLElement).dataset.chapter);
-          setActiveChapter(index);
-        }
+        if (!current) return;
+
+        document.querySelectorAll("[data-nav]").forEach((link) => {
+          link.classList.toggle(
+            "is-active",
+            link.getAttribute("href") === `#${current.target.id}`,
+          );
+        });
       },
-      { rootMargin: "-30% 0px -38% 0px", threshold: [0.1, 0.35, 0.7] },
+      { rootMargin: "-30% 0px -60% 0px", threshold: [0, 0.35] },
     );
 
+    revealElements.forEach((element) => revealObserver.observe(element));
     document
-      .querySelectorAll("[data-reveal]")
-      .forEach((item) => revealObserver.observe(item));
-    document
-      .querySelectorAll("[data-chapter]")
-      .forEach((item) => chapterObserver.observe(item));
+      .querySelectorAll("section[id]")
+      .forEach((section) => navigationObserver.observe(section));
 
-    setProgress();
-    window.addEventListener("scroll", setProgress, { passive: true });
-    window.addEventListener("resize", setProgress);
+    measureMotion();
+    updateMotion();
+    window.addEventListener("scroll", requestMotionUpdate, { passive: true });
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("load", handleResize);
+    window.addEventListener("pointermove", updatePointer, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", setProgress);
-      window.removeEventListener("resize", setProgress);
+      cancelAnimationFrame(frame);
+      cancelAnimationFrame(pointerFrame);
+      window.removeEventListener("scroll", requestMotionUpdate);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("load", handleResize);
+      window.removeEventListener("pointermove", updatePointer);
       revealObserver.disconnect();
-      chapterObserver.disconnect();
+      navigationObserver.disconnect();
+      root.classList.remove("js", "is-scrolled");
+      delete root.dataset.direction;
     };
-  }, []);
+  }, [language]);
 
   return (
     <main id="top">
-      <a className="skip-link" href="#story">
-        Skip to professional development
+      <a className="skip-link" href="#work">
+        {content.skip}
       </a>
 
-      <div className="scroll-meter" aria-hidden="true">
+      <div className="page-progress" aria-hidden="true">
         <span />
       </div>
+      <div className="cursor-wash" aria-hidden="true" />
 
       <header className="site-header">
-        <a className="monogram" href="#top" aria-label="Back to the beginning">
+        <a className="logo" href="#top" aria-label={content.footer.top}>
           SM<span>.</span>
         </a>
-        <nav aria-label="Primary navigation">
-          <a href="#story">Development</a>
-          <a href="#work">Projects</a>
-          <a href="#principles">Methods</a>
+
+        <nav
+          aria-label={
+            language === "de" ? "Hauptnavigation" : "Primary navigation"
+          }
+        >
+          <a href="#experience" data-nav>
+            {content.navigation.experience}
+          </a>
+          <a href="#work" data-nav>
+            {content.navigation.work}
+          </a>
+          <a href="#methods" data-nav>
+            {content.navigation.methods}
+          </a>
         </nav>
-        <a className="header-contact" href="#contact">
-          Contact <Arrow />
-        </a>
+
+        <div className="header-actions">
+          <div
+            className="language-switcher"
+            role="group"
+            aria-label={content.controls.language}
+          >
+            {(["en", "de"] as const).map((option) => (
+              <button
+                type="button"
+                key={option}
+                aria-pressed={language === option}
+                aria-label={
+                  option === "en"
+                    ? "English"
+                    : language === "de"
+                      ? "Deutsch"
+                      : "German"
+                }
+                onClick={() => setLanguage(option)}
+              >
+                {option.toUpperCase()}
+              </button>
+            ))}
+          </div>
+          <button
+            className="motion-toggle"
+            type="button"
+            aria-pressed={motionEnabled}
+            onClick={() => setMotionEnabled((enabled) => !enabled)}
+          >
+            <span aria-hidden="true" />
+            {content.controls.motion}{" "}
+            {motionEnabled ? content.controls.on : content.controls.off}
+          </button>
+          <a className="header-cta" href="#contact">
+            {content.controls.talk} <Arrow />
+          </a>
+        </div>
       </header>
 
-      <section className="hero" aria-labelledby="hero-title">
-        <div className="hero-grid" aria-hidden="true" />
-        <div className="hero-glow" aria-hidden="true" />
-
-        <div className="hero-copy">
-          <div className="hero-kicker reveal-now">
-            <span className="availability-dot" />
-            AI &amp; MLOps Engineer · Germany
-          </div>
-          <h1 id="hero-title" className="reveal-now reveal-delay-1">
-            Current AI systems work
-            <span>and prior engineering experience.</span>
-          </h1>
-          <p className="hero-lede reveal-now reveal-delay-2">
-            This portfolio presents current university research responsibilities
-            first, followed by the academic and industrial experience that
-            preceded them.
-          </p>
-          <div className="hero-actions reveal-now reveal-delay-3">
-            <a className="button button-primary" href="#story">
-              Review from latest to earliest <span aria-hidden="true">↓</span>
-            </a>
-            <a
-              className="button button-ghost"
-              href="/Sepehr-Mortazavi-CV.pdf"
-              target="_blank"
-              rel="noreferrer"
-            >
-              View the résumé <Arrow />
-            </a>
-          </div>
+      <section
+        className="hero"
+        id="intro"
+        data-motion
+        aria-labelledby="hero-title"
+      >
+        <div className="hero-rules" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+          <span />
         </div>
 
-        <div className="hero-character-wrap reveal-now reveal-delay-2">
-          <CharacterTheatre active={0} hero />
+        <div className="hero-topline">
+          <span>{content.hero.role}</span>
+          <span>{content.hero.location}</span>
+          <span>{content.hero.availability}</span>
         </div>
 
-        <div className="hero-foot reveal-now reveal-delay-3">
-          <span>Scroll from latest to earliest</span>
-          <span className="scroll-line" aria-hidden="true" />
-          <span>NOW — 2018</span>
-        </div>
-      </section>
+        <h1 id="hero-title">
+          <span className="name-row name-row-one">
+            <i>SEPEHR</i>
+            <small>{content.hero.engineering}</small>
+          </span>
+          <span className="name-row name-row-two">
+            <small>{content.hero.intelligence}</small>
+            <i>MORTAZAVI</i>
+          </span>
+        </h1>
 
-      <section className="story-intro section-shell" id="story">
-        <div className="section-label" data-reveal>
-          <span>00</span> PROFESSIONAL DEVELOPMENT
-        </div>
-        <div className="intro-statement" data-reveal>
-          <p>PRESENT — 2018</p>
-          <h2>Current position and preceding technical development.</h2>
-        </div>
-      </section>
-
-      <section className="story character-story section-shell" aria-label="Reverse chronological professional and academic development">
-        <div className="chapter-feed">
-          <article
-            className="story-chapter"
-            id="responsibility"
-            data-chapter="0"
-            data-reveal
-          >
-            <div className="chapter-meta">
-              <span>2025 — NOW</span>
-              <span>OSTFALIA UNIVERSITY</span>
-            </div>
-            <p className="chapter-overline">STAGE ONE · UNIVERSITY RESEARCH WORK</p>
-            <h3>Research work includes deployment and supervision duties.</h3>
-            <p className="chapter-lede">
-              At Ostfalia, I develop and deploy AI components, maintain
-              GDPR-compliant Linux infrastructure and guide student teams
-              through robotics and AI projects.
-            </p>
-            <div className="responsibility-grid">
-              <div>
-                <span>01</span>
-                <strong>Build</strong>
-                <p>Software and AI components</p>
-              </div>
-              <div>
-                <span>02</span>
-                <strong>Operate</strong>
-                <p>Linux and lab infrastructure</p>
-              </div>
-              <div>
-                <span>03</span>
-                <strong>Guide</strong>
-                <p>Student engineering teams</p>
-              </div>
-            </div>
-            <p className="chapter-body">
-              The role requires reproducible project structures, technical
-              testing, documentation and infrastructure maintenance in addition
-              to software implementation.
-            </p>
-          </article>
-
-          <article
-            className="story-chapter signal-chapter"
-            id="signal"
-            data-chapter="1"
-            data-reveal
-          >
-            <div className="chapter-meta">
-              <span>2025</span>
-              <span>TUNICORN INNOVATION COMPETITION</span>
-            </div>
-            <p className="chapter-overline">STAGE TWO · CELLCORE</p>
-            <h3>CellCore integrated computer vision and deployment.</h3>
-            <p className="chapter-lede">
-              CellCore received first place at the TUniCorn 2025 innovation
-              competition. The project is a GDPR-compliant platform for
-              microscopy cell segmentation and analysis.
-            </p>
-            <p className="chapter-body">
-              The implementation combines Cellpose, FastAPI, on-premise GPU
-              inference, Docker, Kubernetes, Helm and CI/CD.
-            </p>
-          </article>
-
-          <article
-            className="story-chapter"
-            id="shift"
-            data-chapter="2"
-            data-reveal
-          >
-            <div className="chapter-meta">
-              <span>2023 — 2026</span>
-              <span>TU CLAUSTHAL</span>
-            </div>
-            <p className="chapter-overline">STAGE THREE · GRADUATE STUDY</p>
-            <h3>Graduate study shifted my work toward AI systems.</h3>
-            <p className="chapter-lede">
-              The M.Sc. Digital Technologies programme at TU Clausthal covers AI
-              engineering, MLOps, cyber-physical systems and production-grade
-              machine-learning applications.
-            </p>
-            <div className="system-stack" aria-label="A progression of engineering capabilities">
-              <span>MECHANICS</span>
-              <i aria-hidden="true">→</i>
-              <span>SOFTWARE</span>
-              <i aria-hidden="true">→</i>
-              <span>AI</span>
-              <i aria-hidden="true">→</i>
-              <span>OPERATIONS</span>
-            </div>
-            <p className="chapter-body">
-              Project work includes computer vision, backend APIs, model
-              deployment, robotics simulation and reinforcement learning.
-            </p>
-          </article>
-
-          <article
-            className="story-chapter"
-            id="crossing"
-            data-chapter="3"
-            data-reveal
-          >
-            <div className="chapter-meta">
-              <span>2021 — 2023</span>
-              <span>IRAN → GERMANY</span>
-            </div>
-            <p className="chapter-overline">STAGE FOUR · ACADEMIC PREPARATION</p>
-            <h3>Language and study preparation in Germany.</h3>
-            <p className="chapter-lede">
-              Between 2021 and 2023, I completed German language courses,
-              university applications and academic preparation for the M.Sc.
-              programme.
-            </p>
-            <div className="language-card">
-              <div>
-                <strong>C1</strong>
-                <span>German</span>
-              </div>
-              <div>
-                <strong>B2</strong>
-                <span>English</span>
-              </div>
-              <p>
-                Part-time hotel reception work included guest service,
-                check-in/check-out and operational coordination in German and
-                English.
-              </p>
-            </div>
-            <p className="chapter-body">
-              This period produced documented German C1 and English B2 language
-              proficiency and practical experience in service coordination.
-            </p>
-          </article>
-
-          <article
-            className="story-chapter"
-            id="origin"
-            data-chapter="4"
-            data-reveal
-          >
-            <div className="chapter-meta">
-              <span>2018 — 2021</span>
-              <span>ISFAHAN, IRAN</span>
-            </div>
-            <p className="chapter-overline">STAGE FIVE · MANUFACTURING</p>
-            <h3>Manufacturing established my systems perspective.</h3>
-            <p className="chapter-lede">
-              From 2018 to 2021, I worked in CNC machining, injection-mould
-              tooling, assembly-line coordination and quality assurance at
-              Behsazanbazou Industrial Group.
-            </p>
-            <div className="chapter-evidence">
-              <span>RESPONSIBILITIES</span>
-              <strong>CNC · TOOLING · ASSEMBLY · QUALITY ASSURANCE</strong>
-            </div>
-            <p className="chapter-body">
-              This experience introduced process tracing, tolerance management,
-              production coordination and verification at the system level.
-            </p>
-          </article>
-        </div>
-        <aside className="character-stage-wrap" aria-label="Stage-specific character illustration and factual summary">
-          <CharacterTheatre active={activeChapter} />
-        </aside>
-      </section>
-
-      <section className="work section-shell" id="work">
-        <div className="work-heading" data-reveal>
-          <div className="section-label">
-            <span>06</span> SELECTED IMPLEMENTATIONS
-          </div>
-          <h2>Selected technical implementations.</h2>
+        <div className="hero-bottom">
           <p>
-            The projects below cover computer vision, robotics, full-stack
-            systems and remote-sensing analysis.
+            {content.hero.leadStart}
+            <strong>{content.hero.models}</strong>
+            {content.hero.betweenModelsAndSoftware}
+            <strong>{content.hero.software}</strong>
+            {content.hero.betweenSoftwareAndOperations}
+            <strong>{content.hero.operations}</strong>
+            {content.hero.leadEnd}
           </p>
+          <a href="#experience">
+            {content.hero.scroll} <Arrow direction="down" />
+          </a>
         </div>
 
-        <div className="project-grid">
-          {projects.map((project, index) => (
-            <article
-              className={`project-card ${index === 0 ? "project-featured" : ""}`}
-              key={project.title}
-              data-reveal
-            >
-              <a
-                className="project-image"
-                href={project.href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={`${project.linkLabel}: ${project.title}`}
-              >
-                <img src={project.image} alt={project.imageAlt} />
-                <div className="project-image-overlay" aria-hidden="true">
-                  <span>{project.number}</span>
-                  <span>OPEN PROJECT ↗</span>
-                </div>
-              </a>
-              <div className="project-copy">
-                <div className="project-topline">
-                  <span>{project.eyebrow}</span>
-                  <span>{project.number} / 04</span>
-                </div>
-                <h3>{project.title}</h3>
-                <p>{project.description}</p>
-                <div className="project-outcome">
-                  <span>EVIDENCE</span>
-                  <strong>{project.outcome}</strong>
-                </div>
-                <div className="project-bottom">
-                  <ul aria-label={`${project.title} technologies`}>
-                    {project.tags.map((tag) => (
-                      <li key={tag}>{tag}</li>
+        <OrbitStamp text={content.hero.orbit} />
+
+        <div className="hero-scroll-line" aria-hidden="true">
+          <span />
+          <small>SCROLL</small>
+        </div>
+      </section>
+
+      <section
+        className="statement"
+        data-motion
+        aria-label={content.statement.aria}
+      >
+        <div className="statement-index">{content.statement.index}</div>
+        <h2>
+          <span>{content.statement.line1}</span>
+          <span>
+            {content.statement.line2Start}{" "}
+            <em>{content.statement.line2Emphasis}</em>
+          </span>
+          <span>
+            {content.statement.line3Start}{" "}
+            <em>{content.statement.line3Emphasis}</em>
+          </span>
+        </h2>
+        <div className="statement-notes">
+          <p>{content.statement.note}</p>
+          <span aria-hidden="true">↘</span>
+        </div>
+      </section>
+
+      <section className="experience section-shell" id="experience">
+        <div className="section-head" data-reveal>
+          <span>01</span>
+          <p>{content.experienceSection.eyebrow}</p>
+          <h2>{content.experienceSection.title}</h2>
+        </div>
+
+        <div className="experience-list">
+          {content.experiences.map((item) => (
+            <article key={item.number} data-motion data-reveal>
+              <div className="experience-number">{item.number}</div>
+              <div className="experience-date">
+                <strong>{item.years}</strong>
+                <span>{item.company}</span>
+              </div>
+              <div className="experience-copy">
+                <p>{item.role}</p>
+                <h3>{item.headline}</h3>
+                <div>
+                  <p>{item.summary}</p>
+                  <ul
+                    aria-label={`${item.role}: ${content.generic.technologies}`}
+                  >
+                    {item.capabilities.map((capability) => (
+                      <li key={capability}>{capability}</li>
                     ))}
                   </ul>
-                  <a href={project.href} target="_blank" rel="noreferrer">
-                    {project.linkLabel} <Arrow />
-                  </a>
                 </div>
+              </div>
+              <div className="experience-arrow" aria-hidden="true">
+                ↘
               </div>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="numbers" aria-label="Selected results">
-        <div className="numbers-track">
-          <div>
-            <strong>85%</strong>
-            <span>robot target success</span>
-          </div>
-          <div>
-            <strong>40%</strong>
-            <span>less manual print preparation</span>
-          </div>
-          <div>
-            <strong>1st</strong>
-            <span>TUniCorn 2025</span>
-          </div>
-          <div>
-            <strong>3</strong>
-            <span>Persian · German C1 · English B2</span>
-          </div>
+      <div className="kinetic-band" data-motion aria-hidden="true">
+        <div className="kinetic-track track-forward">
+          {content.band.forward.map((word, index) => (
+            <Fragment key={`${word}-${index}`}>
+              <span>{word}</span>
+              {index < content.band.forward.length - 1 ? <i>→</i> : null}
+            </Fragment>
+          ))}
         </div>
-      </section>
+        <div className="kinetic-track track-reverse">
+          {content.band.reverse.map((word, index) => (
+            <Fragment key={`${word}-${index}`}>
+              <span>{word}</span>
+              {index < content.band.reverse.length - 1 ? <i>•</i> : null}
+            </Fragment>
+          ))}
+        </div>
+      </div>
 
-      <section className="principles section-shell" id="principles">
-        <div className="principles-heading" data-reveal>
-          <div className="section-label">
-            <span>07</span> METHODS
-          </div>
-          <h2>Engineering methods.</h2>
-        </div>
-        <div className="principle-list">
-          <article data-reveal>
-            <span>01</span>
-            <h3>System-level analysis</h3>
-            <p>
-              Requirements, model behaviour, APIs, deployment constraints and
-              infrastructure are evaluated as interacting system components.
-            </p>
-          </article>
-          <article data-reveal>
+      <section className="work" id="work">
+        <div className="work-intro section-shell" data-motion>
+          <div className="section-head">
             <span>02</span>
-            <h3>Verification and observability</h3>
-            <p>
-              Testing, monitoring and documentation provide evidence for system
-              behaviour and deployment status.
-            </p>
-          </article>
-          <article data-reveal>
-            <span>03</span>
-            <h3>Technical communication</h3>
-            <p>
-              Decisions, interfaces and operating procedures are documented for
-              project teams, supervisors and future maintainers.
-            </p>
-          </article>
+            <p>{content.workSection.eyebrow}</p>
+            <h2>{content.workSection.title}</h2>
+          </div>
+          <p>{content.workSection.intro}</p>
+        </div>
+
+        <div className="project-stack">
+          {content.projects.map((project, index) => (
+            <ProjectScene
+              project={project}
+              index={index}
+              total={content.projects.length}
+              generic={content.generic}
+              key={`${language}-${project.number}`}
+            />
+          ))}
         </div>
       </section>
 
-      <section className="contact section-shell" id="contact">
-        <div className="contact-orbit" aria-hidden="true" />
-        <div className="contact-copy" data-reveal>
-          <p>CONTACT</p>
-          <h2>
-            Open to engineering roles and research collaboration.
-            <span>AI/ML engineering · MLOps · robotics.</span>
-          </h2>
+      <section
+        className="numbers"
+        data-motion
+        aria-label={content.evidence.aria}
+      >
+        <div className="numbers-title">
+          <span>{content.evidence.index}</span>
+          <h2>{content.evidence.title}</h2>
         </div>
-        <div className="contact-actions" data-reveal>
-          <a className="contact-email" href="mailto:msepehr812@gmail.com">
-            <span>EMAIL</span>
-            <strong>msepehr812@gmail.com</strong>
-            <Arrow />
-          </a>
-          <div className="contact-links">
-            <a
-              href="https://github.com/SepehrMortazavi"
-              target="_blank"
-              rel="noreferrer"
-            >
-              GitHub <Arrow />
+        <div className="number-grid">
+          {content.evidence.items.map((item) => (
+            <div key={item.number}>
+              <span>{item.number}</span>
+              <strong>{item.value}</strong>
+              <p>{item.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="methods section-shell" id="methods" data-motion>
+        <div className="section-head" data-reveal>
+          <span>04</span>
+          <p>{content.methodsSection.eyebrow}</p>
+          <h2>{content.methodsSection.title}</h2>
+        </div>
+
+        <div className="method-list">
+          {content.methodsSection.items.map(([number, title, description]) => (
+            <article key={number} data-reveal>
+              <span>{number}</span>
+              <h3>{title}</h3>
+              <p>{description}</p>
+              <i aria-hidden="true">↗</i>
+            </article>
+          ))}
+        </div>
+
+        <div className="method-ribbon" aria-hidden="true">
+          {content.methodsSection.ribbon.map((word, index) => (
+            <Fragment key={word}>
+              <span>{word}</span>
+              {index < content.methodsSection.ribbon.length - 1 ? (
+                <i>×</i>
+              ) : null}
+            </Fragment>
+          ))}
+        </div>
+      </section>
+
+      <section className="contact" id="contact" data-motion>
+        <div className="contact-word" aria-hidden="true">
+          {language === "de" ? "HALLO" : "HELLO"}
+        </div>
+        <div className="contact-inner section-shell">
+          <div className="contact-copy">
+            <span>{content.contact.index}</span>
+            <h2>
+              {content.contact.title}
+              <em>{content.contact.emphasis}</em>
+            </h2>
+            <p>{content.contact.body}</p>
+          </div>
+
+          <div className="contact-actions">
+            <a className="email-link" href="mailto:msepehr812@gmail.com">
+              <span>{content.contact.email}</span>
+              <strong>msepehr812@gmail.com</strong>
+              <Arrow />
             </a>
-            <a
-              href="https://linkedin.com/in/sepehr-mortazavi/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              LinkedIn <Arrow />
-            </a>
+            <div>
+              <a
+                href="https://github.com/SepehrMortazavi"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {content.contact.github} <Arrow />
+              </a>
+              <a
+                href="https://linkedin.com/in/sepehr-mortazavi/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {content.contact.linkedin} <Arrow />
+              </a>
+              <a
+                href="/Sepehr-Mortazavi-CV.pdf"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {content.contact.resume} <Arrow />
+              </a>
+            </div>
           </div>
         </div>
       </section>
 
       <footer className="site-footer section-shell">
-        <span>© 2026 Seyed Sepehr Mortazavi</span>
-        <span>CLAUSTHAL-ZELLERFELD · GERMANY</span>
-        <a href="#top">Return to the beginning ↑</a>
+        <span>© 2026 SEYED SEPEHR MORTAZAVI</span>
+        <span>{content.footer.designed}</span>
+        <a href="#top">{content.footer.top} ↑</a>
       </footer>
     </main>
   );
