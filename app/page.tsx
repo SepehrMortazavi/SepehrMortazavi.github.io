@@ -18,6 +18,10 @@ function Arrow({ direction = "diagonal" }: { direction?: "diagonal" | "down" | "
   );
 }
 
+function isExternalLink(href: string) {
+  return href.startsWith("http") || href.startsWith("mailto:");
+}
+
 function OrbitStamp({ text }: { text: string }) {
   return (
     <div className="orbit-stamp" aria-hidden="true">
@@ -131,8 +135,8 @@ function ProjectScene({
               className={`project-link link-${action.emphasis ?? "primary"}`}
               href={action.href}
               key={action.href}
-              target="_blank"
-              rel="noreferrer"
+              target={isExternalLink(action.href) ? "_blank" : undefined}
+              rel={isExternalLink(action.href) ? "noreferrer" : undefined}
             >
               {action.label} <Arrow />
             </a>
@@ -144,8 +148,8 @@ function ProjectScene({
         <a
           className="project-media"
           href={project.mediaHref}
-          target="_blank"
-          rel="noreferrer"
+          target={isExternalLink(project.mediaHref) ? "_blank" : undefined}
+          rel={isExternalLink(project.mediaHref) ? "noreferrer" : undefined}
           aria-label={`${project.mediaLabel ?? generic.open}: ${project.title}`}
         >
           {mediaContents}
@@ -325,8 +329,8 @@ export default function Home() {
           <a href="#work" data-nav>
             {content.navigation.work}
           </a>
-          <a href="#methods" data-nav>
-            {content.navigation.methods}
+          <a href="#skills" data-nav>
+            {content.navigation.skills}
           </a>
         </nav>
 
@@ -410,9 +414,22 @@ export default function Home() {
             <strong>{content.hero.operations}</strong>
             {content.hero.leadEnd}
           </p>
-          <a href="#experience">
-            {content.hero.scroll} <Arrow direction="down" />
-          </a>
+          <div className="hero-actions">
+            <a
+              className="resume-download"
+              href="/Sepehr-Mortazavi-CV.pdf"
+              download
+            >
+              <span>
+                <strong>{content.hero.download}</strong>
+                <small>{content.hero.downloadMeta}</small>
+              </span>
+              <Arrow direction="down" />
+            </a>
+            <a className="hero-scroll-link" href="#experience">
+              {content.hero.scroll} <Arrow direction="down" />
+            </a>
+          </div>
         </div>
 
         <OrbitStamp text={content.hero.orbit} />
@@ -421,6 +438,27 @@ export default function Home() {
           <span />
           <small>SCROLL</small>
         </div>
+      </section>
+
+      <section
+        className="agenda section-shell"
+        data-motion
+        aria-label={content.agenda.label}
+      >
+        <div className="agenda-heading">
+          <span>{content.agenda.label}</span>
+          <h2>{content.agenda.title}</h2>
+        </div>
+        <nav aria-label={content.agenda.label}>
+          {content.agenda.items.map((item) => (
+            <a href={item.href} key={item.number} data-reveal>
+              <span>{item.number}</span>
+              <strong>{item.label}</strong>
+              <small>{item.detail}</small>
+              <i aria-hidden="true">↘</i>
+            </a>
+          ))}
+        </nav>
       </section>
 
       <section
@@ -545,29 +583,88 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="methods section-shell" id="methods" data-motion>
+      <section className="skills section-shell" id="skills" data-motion>
         <div className="section-head" data-reveal>
           <span>04</span>
-          <p>{content.methodsSection.eyebrow}</p>
-          <h2>{content.methodsSection.title}</h2>
+          <p>{content.skillsSection.eyebrow}</p>
+          <h2>{content.skillsSection.title}</h2>
         </div>
 
-        <div className="method-list">
-          {content.methodsSection.items.map(([number, title, description]) => (
-            <article key={number} data-reveal>
-              <span>{number}</span>
-              <h3>{title}</h3>
-              <p>{description}</p>
-              <i aria-hidden="true">↗</i>
-            </article>
-          ))}
+        <div className="skills-intro">
+          <p data-reveal>{content.skillsSection.intro}</p>
+          <div className="skill-legend" data-reveal>
+            <span>
+              <i className="level-core" />
+              {content.skillsSection.coreLabel}
+            </span>
+            <span>
+              <i className="level-working" />
+              {content.skillsSection.workingLabel}
+            </span>
+          </div>
         </div>
 
-        <div className="method-ribbon" aria-hidden="true">
-          {content.methodsSection.ribbon.map((word, index) => (
+        <div className="skills-stage">
+          <div className="skills-orbit" aria-hidden="true">
+            <div className="orbit-ring ring-one" />
+            <div className="orbit-ring ring-two" />
+            <div className="orbit-core">
+              <span>SM / 04</span>
+              <strong>{content.skillsSection.center}</strong>
+            </div>
+            {content.skillsSection.domains.map((domain, index) => (
+              <span
+                className={`orbit-node orbit-node-${index + 1}`}
+                key={domain.number}
+              >
+                {domain.number}
+              </span>
+            ))}
+          </div>
+
+          <div className="skill-grid">
+            {content.skillsSection.domains.map((domain) => (
+              <article
+                className={`skill-card skill-${domain.level}`}
+                key={domain.number}
+                data-reveal
+              >
+                <div className="skill-card-top">
+                  <span>{domain.number}</span>
+                  <small>
+                    <i />
+                    {domain.level === "core"
+                      ? content.skillsSection.coreLabel
+                      : content.skillsSection.workingLabel}
+                  </small>
+                </div>
+                <h3>{domain.title}</h3>
+                <p>{domain.description}</p>
+                <ul aria-label={`${domain.title}: ${content.generic.technologies}`}>
+                  {domain.tools.map((tool) => (
+                    <li key={tool}>{tool}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div className="learning-lane" data-reveal>
+          <span>{content.skillsSection.learningLabel}</span>
+          <ul>
+            {content.skillsSection.learning.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <i aria-hidden="true">↗</i>
+        </div>
+
+        <div className="skill-ribbon" aria-hidden="true">
+          {content.skillsSection.ribbon.map((word, index) => (
             <Fragment key={word}>
               <span>{word}</span>
-              {index < content.methodsSection.ribbon.length - 1 ? (
+              {index < content.skillsSection.ribbon.length - 1 ? (
                 <i>×</i>
               ) : null}
             </Fragment>
@@ -612,8 +709,7 @@ export default function Home() {
               </a>
               <a
                 href="/Sepehr-Mortazavi-CV.pdf"
-                target="_blank"
-                rel="noreferrer"
+                download
               >
                 {content.contact.resume} <Arrow />
               </a>

@@ -17,7 +17,7 @@ test("exports the portfolio with core content and navigation", async () => {
   assert.match(html, /I MOVE IDEAS/);
   assert.match(html, /id="experience"/);
   assert.match(html, /id="work"/);
-  assert.match(html, /id="methods"/);
+  assert.match(html, /id="skills"/);
   assert.match(html, /id="contact"/);
   assert.match(html, /CellCore/);
   assert.match(html, /Master(?:'|&#x27;)s Thesis/i);
@@ -40,11 +40,37 @@ test("exports the portfolio with core content and navigation", async () => {
   );
   assert.match(html, /Sustainable 3D/);
   assert.match(html, /3D Print Manager/);
+  assert.match(html, /OPEN VISUAL CASE STUDY/);
+  assert.match(html, /href="\/projects\/3d-print-manager\/"/);
+  assert.match(html, /Choose where to begin/);
+  assert.match(html, /Skills &amp; Tools/);
+  assert.match(html, /THE STACK BEHIND THE SYSTEMS/);
+  assert.match(html, /Vision-language models/);
   assert.match(html, /Robot-Arm RL/);
   assert.match(html, /aria-label="English"/);
   assert.match(html, /aria-label="German"/);
   assert.match(html, /mailto:msepehr812@gmail\.com/);
-  assert.match(html, /\/Sepehr-Mortazavi-CV\.pdf/);
+  assert.match(
+    html,
+    /href="\/Sepehr-Mortazavi-CV\.pdf" download=""/,
+  );
+});
+
+test("exports the detailed 3D Print Manager case study", async () => {
+  const html = await readFile(
+    new URL("../out/projects/3d-print-manager/index.html", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(html, /FROM MODEL/);
+  assert.match(html, /TO MACHINE/);
+  assert.match(html, /ONE WORKFLOW/);
+  assert.match(html, /PrusaSlicer/);
+  assert.match(html, /OctoPrint/);
+  assert.match(html, /THE APP, SHOWN CLEARLY/);
+  assert.match(html, /does not claim sole authorship/);
+  assert.match(html, /\/projects\/print-manager\/landing-page\.jpg/);
+  assert.match(html, /\/projects\/print-manager\/admin-dashboard\.jpg/);
 });
 
 test("contains complete German translations and publication boundaries", async () => {

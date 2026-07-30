@@ -42,7 +42,7 @@ export type SiteContent = {
   navigation: {
     experience: string;
     work: string;
-    methods: string;
+    skills: string;
   };
   controls: {
     language: string;
@@ -65,7 +65,19 @@ export type SiteContent = {
     operations: string;
     leadEnd: string;
     scroll: string;
+    download: string;
+    downloadMeta: string;
     orbit: string;
+  };
+  agenda: {
+    label: string;
+    title: string;
+    items: Array<{
+      number: string;
+      label: string;
+      detail: string;
+      href: string;
+    }>;
   };
   statement: {
     aria: string;
@@ -102,10 +114,22 @@ export type SiteContent = {
       label: string;
     }>;
   };
-  methodsSection: {
+  skillsSection: {
     eyebrow: string;
     title: string;
-    items: Array<[string, string, string]>;
+    intro: string;
+    center: string;
+    coreLabel: string;
+    workingLabel: string;
+    learningLabel: string;
+    domains: Array<{
+      number: string;
+      title: string;
+      description: string;
+      level: "core" | "working";
+      tools: string[];
+    }>;
+    learning: string[];
     ribbon: string[];
   };
   contact: {
@@ -147,7 +171,7 @@ export const siteContent: Record<Language, SiteContent> = {
     navigation: {
       experience: "Experience",
       work: "Work",
-      methods: "Methods",
+      skills: "Skills & Tools",
     },
     controls: {
       language: "Choose language",
@@ -171,7 +195,39 @@ export const siteContent: Record<Language, SiteContent> = {
       leadEnd:
         " to build intelligent systems that work beyond the prototype.",
       scroll: "Scroll through my résumé",
+      download: "Download résumé",
+      downloadMeta: "PDF · 2 pages · German",
       orbit: "AI ENGINEERING • MLOPS • ROBOTICS • DEPLOYMENT •",
+    },
+    agenda: {
+      label: "QUICK ACCESS",
+      title: "Choose where to begin.",
+      items: [
+        {
+          number: "01",
+          label: "Study & experience",
+          detail: "Research, thesis, education, and industry",
+          href: "#experience",
+        },
+        {
+          number: "02",
+          label: "Selected projects",
+          detail: "Seven systems with evidence and context",
+          href: "#work",
+        },
+        {
+          number: "03",
+          label: "Skills & tools",
+          detail: "Capabilities grouped by delivery outcome",
+          href: "#skills",
+        },
+        {
+          number: "04",
+          label: "Contact",
+          detail: "Roles, collaboration, and direct links",
+          href: "#contact",
+        },
+      ],
     },
     statement: {
       aria: "Engineering focus",
@@ -420,7 +476,8 @@ export const siteContent: Record<Language, SiteContent> = {
         disclosure:
           "Private portfolio mirror of a group project; no sole-authorship claim. The source remains private while collaborator, university, and licensing permissions are unresolved.",
         imageAlt: "Real interface screens from the 3D Print Manager project",
-        mediaLabel: "REAL PROJECT SCREENS",
+        mediaHref: "/projects/3d-print-manager/",
+        mediaLabel: "OPEN VISUAL CASE STUDY",
         gallery: [
           {
             src: "/projects/print-manager/landing-page.jpg",
@@ -435,9 +492,14 @@ export const siteContent: Record<Language, SiteContent> = {
         ],
         actions: [
           {
+            label: "OPEN CASE STUDY",
+            href: "/projects/3d-print-manager/",
+            emphasis: "primary",
+          },
+          {
             label: "REQUEST REPOSITORY ACCESS",
             href: printManagementAccessUrl,
-            emphasis: "primary",
+            emphasis: "secondary",
           },
         ],
         tags: ["Django", "Celery", "PrusaSlicer", "OctoPrint"],
@@ -532,30 +594,62 @@ export const siteContent: Record<Language, SiteContent> = {
         },
       ],
     },
-    methodsSection: {
-      eyebrow: "ENGINEERING METHOD",
-      title: "HOW I BUILD.",
-      items: [
-        [
-          "01",
-          "SEE THE WHOLE SYSTEM",
-          "Model, API, data, infrastructure, and operator are designed as one connected product.",
-        ],
-        [
-          "02",
-          "MAKE BEHAVIOUR VISIBLE",
-          "Tests, monitoring, and documentation turn implementation into evidence.",
-        ],
-        [
-          "03",
-          "BUILD FOR THE NEXT PERSON",
-          "Clear interfaces and operating procedures keep systems maintainable.",
-        ],
+    skillsSection: {
+      eyebrow: "SKILLS & TOOLS",
+      title: "THE STACK BEHIND THE SYSTEMS.",
+      intro:
+        "A capability map grouped by what each tool helps me deliver—not a wall of disconnected keywords.",
+      center: "SYSTEMS",
+      coreLabel: "Core toolkit",
+      workingLabel: "Working knowledge",
+      learningLabel: "Currently expanding",
+      domains: [
+        {
+          number: "01",
+          title: "AI & VISION",
+          description:
+            "From image pipelines and segmentation experiments to usable inference interfaces.",
+          level: "core",
+          tools: ["Python", "PyTorch", "Cellpose", "OpenCV", "NumPy", "Gradio"],
+        },
+        {
+          number: "02",
+          title: "PLATFORM & MLOPS",
+          description:
+            "Reproducible services, container orchestration, delivery pipelines, and Linux operations.",
+          level: "core",
+          tools: ["Docker", "Kubernetes", "Helm", "GitLab CI", "Linux", "Git"],
+        },
+        {
+          number: "03",
+          title: "BACKEND & DATA",
+          description:
+            "APIs, queues, persistence, and service boundaries for dependable technical products.",
+          level: "core",
+          tools: ["FastAPI", "Django", "REST", "PostgreSQL", "Redis", "Celery"],
+        },
+        {
+          number: "04",
+          title: "ROBOTICS & SYSTEMS",
+          description:
+            "Simulation, learning-based control, and engineering practices for physical systems.",
+          level: "working",
+          tools: [
+            "ROS2",
+            "Gazebo",
+            "MuJoCo",
+            "Isaac Sim",
+            "Requirements",
+            "Agile / Scrum",
+          ],
+        },
       ],
+      learning: ["Vision-language models", "AWS / Azure", "MLflow"],
       ribbon: [
-        "RESEARCH DEPTH",
-        "PRODUCTION DISCIPLINE",
-        "TECHNICAL CLARITY",
+        "MODEL",
+        "SERVICE",
+        "INFRASTRUCTURE",
+        "OPERATION",
       ],
     },
     contact: {
@@ -585,7 +679,7 @@ export const siteContent: Record<Language, SiteContent> = {
     navigation: {
       experience: "Erfahrung",
       work: "Projekte",
-      methods: "Arbeitsweise",
+      skills: "Skills & Tools",
     },
     controls: {
       language: "Sprache wählen",
@@ -609,7 +703,39 @@ export const siteContent: Record<Language, SiteContent> = {
       leadEnd:
         " zu intelligenten Systemen, die über den Prototyp hinaus funktionieren.",
       scroll: "Durch meinen Lebenslauf scrollen",
+      download: "Lebenslauf herunterladen",
+      downloadMeta: "PDF · 2 Seiten · Deutsch",
       orbit: "KI-ENGINEERING • MLOPS • ROBOTIK • DEPLOYMENT •",
+    },
+    agenda: {
+      label: "SCHNELLZUGRIFF",
+      title: "Womit möchten Sie beginnen?",
+      items: [
+        {
+          number: "01",
+          label: "Studium & Erfahrung",
+          detail: "Forschung, Masterarbeit, Studium und Industrie",
+          href: "#experience",
+        },
+        {
+          number: "02",
+          label: "Ausgewählte Projekte",
+          detail: "Sieben Systeme mit Ergebnissen und Kontext",
+          href: "#work",
+        },
+        {
+          number: "03",
+          label: "Skills & Tools",
+          detail: "Fähigkeiten nach ihrem Nutzen gruppiert",
+          href: "#skills",
+        },
+        {
+          number: "04",
+          label: "Kontakt",
+          detail: "Positionen, Zusammenarbeit und direkte Links",
+          href: "#contact",
+        },
+      ],
     },
     statement: {
       aria: "Technischer Schwerpunkt",
@@ -859,7 +985,8 @@ export const siteContent: Record<Language, SiteContent> = {
         disclosure:
           "Privater Portfolio-Spiegel eines Gruppenprojekts; keine Behauptung der alleinigen Urheberschaft. Der Quellcode bleibt privat, solange Zustimmungen und Lizenzfragen nicht geklärt sind.",
         imageAlt: "Echte Ansichten aus dem Projekt 3D-Druck-Manager",
-        mediaLabel: "ECHTE PROJEKTANSICHTEN",
+        mediaHref: "/projects/3d-print-manager/",
+        mediaLabel: "VISUELLE FALLSTUDIE ÖFFNEN",
         gallery: [
           {
             src: "/projects/print-manager/landing-page.jpg",
@@ -874,9 +1001,14 @@ export const siteContent: Record<Language, SiteContent> = {
         ],
         actions: [
           {
+            label: "FALLSTUDIE ÖFFNEN",
+            href: "/projects/3d-print-manager/",
+            emphasis: "primary",
+          },
+          {
             label: "REPOSITORY-ZUGANG ANFRAGEN",
             href: printManagementAccessUrl,
-            emphasis: "primary",
+            emphasis: "secondary",
           },
         ],
         tags: ["Django", "Celery", "PrusaSlicer", "OctoPrint"],
@@ -972,30 +1104,62 @@ export const siteContent: Record<Language, SiteContent> = {
         },
       ],
     },
-    methodsSection: {
-      eyebrow: "ENGINEERING-METHODE",
-      title: "WIE ICH ARBEITE.",
-      items: [
-        [
-          "01",
-          "DAS GESAMTSYSTEM SEHEN",
-          "Modell, API, Daten, Infrastruktur und Bedienung werden als ein verbundenes Produkt gestaltet.",
-        ],
-        [
-          "02",
-          "VERHALTEN SICHTBAR MACHEN",
-          "Tests, Monitoring und Dokumentation machen aus Implementierung belastbare Evidenz.",
-        ],
-        [
-          "03",
-          "FÜR DIE NÄCHSTE PERSON BAUEN",
-          "Klare Schnittstellen und Betriebsabläufe halten Systeme langfristig wartbar.",
-        ],
+    skillsSection: {
+      eyebrow: "SKILLS & TOOLS",
+      title: "DER STACK HINTER DEN SYSTEMEN.",
+      intro:
+        "Eine Capability Map, geordnet danach, was die Werkzeuge ermöglichen—keine Wand aus unverbundenen Schlagwörtern.",
+      center: "SYSTEME",
+      coreLabel: "Kernwerkzeuge",
+      workingLabel: "Praxiserfahrung",
+      learningLabel: "Aktuell im Ausbau",
+      domains: [
+        {
+          number: "01",
+          title: "KI & COMPUTER VISION",
+          description:
+            "Von Bildpipelines und Segmentierungsexperimenten bis zu nutzbaren Inferenzoberflächen.",
+          level: "core",
+          tools: ["Python", "PyTorch", "Cellpose", "OpenCV", "NumPy", "Gradio"],
+        },
+        {
+          number: "02",
+          title: "PLATTFORM & MLOPS",
+          description:
+            "Reproduzierbare Services, Container-Orchestrierung, Delivery-Pipelines und Linux-Betrieb.",
+          level: "core",
+          tools: ["Docker", "Kubernetes", "Helm", "GitLab CI", "Linux", "Git"],
+        },
+        {
+          number: "03",
+          title: "BACKEND & DATEN",
+          description:
+            "APIs, Queues, Persistenz und Servicegrenzen für zuverlässige technische Produkte.",
+          level: "core",
+          tools: ["FastAPI", "Django", "REST", "PostgreSQL", "Redis", "Celery"],
+        },
+        {
+          number: "04",
+          title: "ROBOTIK & SYSTEME",
+          description:
+            "Simulation, lernbasierte Steuerung und Engineering-Praktiken für physische Systeme.",
+          level: "working",
+          tools: [
+            "ROS2",
+            "Gazebo",
+            "MuJoCo",
+            "Isaac Sim",
+            "Requirements",
+            "Agile / Scrum",
+          ],
+        },
       ],
+      learning: ["Vision-Language-Modelle", "AWS / Azure", "MLflow"],
       ribbon: [
-        "FORSCHUNGSTIEFE",
-        "PRODUKTIONSDISZIPLIN",
-        "TECHNISCHE KLARHEIT",
+        "MODELL",
+        "SERVICE",
+        "INFRASTRUKTUR",
+        "BETRIEB",
       ],
     },
     contact: {
